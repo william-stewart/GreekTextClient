@@ -110,7 +110,7 @@ public class GreekGUI extends JFrame {
 	int[] alphabet = {alpha,beta,gamma,delta,epsilon,zeta,eta,theta,iota,kappa,lambda,mu,nu,xi,omicron,pi,rho,sigma,tau,upsilon,phi,chi,psi,omega};
 	
 
-	/*
+	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
