@@ -107,6 +107,8 @@ public class GreekGUI extends JFrame {
 	static int psi = 0x03c8;
 	static int omega = 0x03c9;
 	
+	static int alphaSmooth = 0x1f00;
+	
 	int[] alphabet = {alpha,beta,gamma,delta,epsilon,zeta,eta,theta,iota,kappa,lambda,mu,nu,xi,omicron,pi,rho,sigma,tau,upsilon,phi,chi,psi,omega};
 	
 
@@ -168,12 +170,12 @@ public class GreekGUI extends JFrame {
 	
 	public void shiftCase(){
 		if(!capsOn){
-			for(int i=0;i<alphabet.length-1;i++){
+			for(int i=0;i<alphabet.length;i++){
 				alphabet[i]-=0x0020;
 			}
 			capsOn=true;
 		}else{
-			for(int i=0;i<alphabet.length-1;i++){
+			for(int i=0;i<alphabet.length;i++){
 				alphabet[i]+=0x0020;
 			}
 			capsOn=false;
@@ -184,6 +186,34 @@ public class GreekGUI extends JFrame {
 	public String hexConverter(int hexVal){
 		return Character.toString((char)(Integer.parseInt(Integer.toHexString(hexVal),16)));
 	}
+	
+	public void commonDiacritic(int diacritic){
+		alphabet[0]=alphaSmooth+ diacritic-1;
+		alphabet[4]=alphaSmooth+0x0010+diacritic-1;
+		alphabet[6]=alphaSmooth+0x0020+diacritic-1;
+		alphabet[8]=alphaSmooth+0x0030+diacritic-1;
+		alphabet[14]=alphaSmooth+0x0040+diacritic-1;
+		alphabet[19]=alphaSmooth+0x0050+diacritic-1;
+		alphabet[23]=alphaSmooth+0x0060+diacritic-1;
+	}
+	
+	public void addDiacritic(int diacritic){
+		//Reset all vowels
+		if(diacritic == 0){
+			alphabet[0] = alpha;
+			alphabet[4] =  epsilon;
+			alphabet[6] = eta;
+			alphabet[8] = iota;
+			alphabet[14] = omicron;
+			alphabet[19] = upsilon;
+			alphabet[23] = omega;
+		}
+		//all common breathings
+		else if(diacritic < 8){
+			commonDiacritic(diacritic);
+		}
+		resetButtonText();
+	}
 
 	/**
 	 * Create the frame.
@@ -191,12 +221,12 @@ public class GreekGUI extends JFrame {
 	public GreekGUI() {
 		this.keyboardAnchorX = 100;
 		this.keyboardAnchorY = 300;
-		this.keyWidth = 50;
-		this.keyHeight = 50;
+		this.keyWidth = 60;
+		this.keyHeight = 60;
 		this.keyboardAnchorXRowTwo = keyboardAnchorX-12;
-		this.keyboardAnchorYRowTwo = keyboardAnchorY+50;
+		this.keyboardAnchorYRowTwo = keyboardAnchorY+keyHeight;
 		this.keyboardAnchorXRowThree = keyboardAnchorX;
-		this.keyboardAnchorYRowThree = keyboardAnchorY+100;
+		this.keyboardAnchorYRowThree = keyboardAnchorY+(2*keyHeight);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Greek Text Client");
 		setBounds(100, 100, 1200, 750);
@@ -206,11 +236,6 @@ public class GreekGUI extends JFrame {
 		contentPane.setLayout(null);
 		
 		
-		JPopupMenu popupMenu = new JPopupMenu("Popup");
-		popupMenu.setSize(181, 150);
-		//popupMenu.setLocation(150, 273);
-		popupMenu.add("example");
-		addPopup(contentPane, popupMenu);
 		
 		//Top label
 		JLabel lblTypeHere = new JLabel("Type here:");
@@ -218,7 +243,7 @@ public class GreekGUI extends JFrame {
 		contentPane.add(lblTypeHere);
 		
 		//Text Pane
-		textPane.setFont(new Font("Calibri", Font.PLAIN, 20));
+		textPane.setFont(new Font("Calibri", Font.PLAIN, 24));
 		textPane.setContentType("UTF-8");
 		textPane.setBounds(12, 30, 679, 235);
 		contentPane.add(textPane);
@@ -254,19 +279,18 @@ public class GreekGUI extends JFrame {
 		btnEndSigma.setBounds(keyboardAnchorX, keyboardAnchorY, keyWidth, keyHeight);
 		contentPane.add(btnEndSigma);
 		
-		btnEpsilonLow = new JButton("\u03B5");
+		btnEpsilonLow = new JButton(hexConverter(alphabet[4]));
 		btnEpsilonLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnEpsilonLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03B5");
+					appendString(hexConverter(alphabet[4]));
 					}catch(Exception e){}
 			}
 		});
 		btnEpsilonLow.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseEntered(java.awt.event.MouseEvent evt) {
 		    	try{
-		    		popupMenu.show(btnEpsilonLow,0,-50);
 		    	}
 		    	catch(Exception e){}
 		    }
@@ -276,91 +300,91 @@ public class GreekGUI extends JFrame {
 		    	popupMenu.hide();
 		    }
 		});
-		btnEpsilonLow.setBounds(keyboardAnchorX+50, keyboardAnchorY, keyWidth, keyHeight);
+		btnEpsilonLow.setBounds(keyboardAnchorX+keyWidth, keyboardAnchorY, keyWidth, keyHeight);
 		contentPane.add(btnEpsilonLow);
 		
-		 btnRhoLow = new JButton("\u03C1");
+		 btnRhoLow = new JButton(hexConverter(alphabet[16]));
 		btnRhoLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnRhoLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03C1");
+					appendString(hexConverter(alphabet[16]));
 					}catch(Exception e){}
 			}
 		});
-		btnRhoLow.setBounds(keyboardAnchorX+100, keyboardAnchorY, keyWidth, keyHeight);
+		btnRhoLow.setBounds(keyboardAnchorX+keyWidth*2, keyboardAnchorY, keyWidth, keyHeight);
 		contentPane.add(btnRhoLow);
 		
-		 btnTauLow = new JButton("\u03C4");
+		 btnTauLow = new JButton(hexConverter(alphabet[18]));
 		btnTauLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03C4");
+					appendString(hexConverter(alphabet[18]));
 					}catch(Exception e){}
 			}
 		});
 		btnTauLow.setFont(new Font("Calibri", Font.PLAIN, 22));
-		btnTauLow.setBounds(keyboardAnchorX+150, keyboardAnchorY, keyWidth, keyHeight);
+		btnTauLow.setBounds(keyboardAnchorX+keyWidth*3, keyboardAnchorY, keyWidth, keyHeight);
 		contentPane.add(btnTauLow);
 		
-		 btnUpsilonLow = new JButton("\u03C5");
+		 btnUpsilonLow = new JButton(hexConverter(alphabet[19]));
 		btnUpsilonLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03C5");
+					appendString(hexConverter(alphabet[19]));
 					}catch(Exception e){}
 			}
 		});
 		btnUpsilonLow.setFont(new Font("Calibri", Font.PLAIN, 22));
-		btnUpsilonLow.setBounds(keyboardAnchorX+200, keyboardAnchorY, keyWidth, keyHeight);
+		btnUpsilonLow.setBounds(keyboardAnchorX+keyWidth*4, keyboardAnchorY, keyWidth, keyHeight);
 		contentPane.add(btnUpsilonLow);
 		
-		 btnThetaLow = new JButton("\u03B8");
+		 btnThetaLow = new JButton(hexConverter(alphabet[7]));
 		btnThetaLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03B8");
+					appendString(hexConverter(alphabet[7]));
 					}catch(Exception e){}
 			}
 		});
 		btnThetaLow.setFont(new Font("Calibri", Font.PLAIN, 22));
-		btnThetaLow.setBounds(keyboardAnchorX+250, keyboardAnchorY, keyWidth, keyHeight);
+		btnThetaLow.setBounds(keyboardAnchorX+keyWidth*5, keyboardAnchorY, keyWidth, keyHeight);
 		contentPane.add(btnThetaLow);
 		
-		 btnIotaLow = new JButton("\u03B9");
+		 btnIotaLow = new JButton(hexConverter(alphabet[8]));
 		 btnIotaLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03B9");
+					appendString(hexConverter(alphabet[8]));
 					}catch(Exception e){}
 			}
 		});
 		 btnIotaLow.setFont(new Font("Calibri", Font.PLAIN, 22));
-		 btnIotaLow.setBounds(keyboardAnchorX+300, keyboardAnchorY, keyWidth, keyHeight);
+		 btnIotaLow.setBounds(keyboardAnchorX+keyWidth*6, keyboardAnchorY, keyWidth, keyHeight);
 		contentPane.add(btnIotaLow);
 		
-		 btnOmicronLow = new JButton("\u03BF");
+		 btnOmicronLow = new JButton(hexConverter(alphabet[14]));
 		btnOmicronLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03BF");
+					appendString(hexConverter(alphabet[14]));
 					}catch(Exception e){}
 			}
 		});
 		btnOmicronLow.setFont(new Font("Calibri", Font.PLAIN, 22));
-		btnOmicronLow.setBounds(keyboardAnchorX+350, keyboardAnchorY, keyWidth, keyHeight);
+		btnOmicronLow.setBounds(keyboardAnchorX+keyWidth*7, keyboardAnchorY, keyWidth, keyHeight);
 		contentPane.add(btnOmicronLow);
 		
-		 btnPiLow = new JButton("\u03C0");
+		 btnPiLow = new JButton(hexConverter(alphabet[15]));
 		btnPiLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03C0");
+					appendString(hexConverter(alphabet[15]));
 					}catch(Exception e){}
 			}
 		});
 		btnPiLow.setFont(new Font("Calibri", Font.PLAIN, 22));
-		btnPiLow.setBounds(keyboardAnchorX+400, keyboardAnchorY, keyWidth, keyHeight);
+		btnPiLow.setBounds(keyboardAnchorX+keyWidth*8, keyboardAnchorY, keyWidth, keyHeight);
 		contentPane.add(btnPiLow);
 		
 		JButton btnDel = new JButton("DEL");
@@ -372,7 +396,7 @@ public class GreekGUI extends JFrame {
 				}catch(Exception e){}
 		}
 		});
-		btnDel.setBounds(keyboardAnchorX+450, keyboardAnchorY, keyWidth+30, keyHeight);
+		btnDel.setBounds(keyboardAnchorX+keyWidth*9, keyboardAnchorY, keyWidth+30, keyHeight);
 		contentPane.add(btnDel);
 		
 		btnAlphaLow = new JButton(hexConverter(alphabet[0]));
@@ -387,13 +411,13 @@ public class GreekGUI extends JFrame {
 		});
 		contentPane.add(btnAlphaLow);
 		
-		 btnSigmaLow = new JButton("\u03c3");
+		 btnSigmaLow = new JButton(hexConverter(alphabet[17]));
 		btnSigmaLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnSigmaLow.setBounds(keyboardAnchorXRowTwo+btnAlphaLow.getWidth(), keyboardAnchorYRowTwo, keyWidth, keyHeight);
 		btnSigmaLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03c3");
+					appendString(hexConverter(alphabet[17]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnSigmaLow);
@@ -409,13 +433,13 @@ public class GreekGUI extends JFrame {
 			}
 		});contentPane.add(btnDeltaLow);
 		
-		 btnPhiLow = new JButton("\u03c6");
+		 btnPhiLow = new JButton(hexConverter(alphabet[20]));
 		btnPhiLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnPhiLow.setBounds(keyboardAnchorXRowTwo+btnAlphaLow.getWidth()*3, keyboardAnchorYRowTwo, keyWidth, keyHeight);
 		btnPhiLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03c6");
+					appendString(hexConverter(alphabet[20]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnPhiLow);
@@ -431,46 +455,46 @@ public class GreekGUI extends JFrame {
 			}
 		});contentPane.add(btnGammaLow);
 		
-		 btnEtaLow = new JButton("\u03b7");
+		 btnEtaLow = new JButton(hexConverter(alphabet[6]));
 		btnEtaLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnEtaLow.setBounds(keyboardAnchorXRowTwo+btnAlphaLow.getWidth()*5, keyboardAnchorYRowTwo, keyWidth, keyHeight);
 		btnEtaLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03b7");
+					appendString(hexConverter(alphabet[6]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnEtaLow);
 		
-		 btnXiLow = new JButton("\u03be");
+		 btnXiLow = new JButton(hexConverter(alphabet[13]));
 		 btnXiLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		 btnXiLow.setBounds(keyboardAnchorXRowTwo+btnAlphaLow.getWidth()*6, keyboardAnchorYRowTwo, keyWidth, keyHeight);
 		 btnXiLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03be");
+					appendString(hexConverter(alphabet[13]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnXiLow);
 		
-		 btnKappaLow = new JButton("\u03ba");
+		 btnKappaLow = new JButton(hexConverter(alphabet[9]));
 		btnKappaLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnKappaLow.setBounds(keyboardAnchorXRowTwo+btnAlphaLow.getWidth()*7, keyboardAnchorYRowTwo, keyWidth, keyHeight);
 		btnKappaLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03ba");
+					appendString(hexConverter(alphabet[9]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnKappaLow);
 		
-		 btnLambdaLow = new JButton("\u03bb");
+		 btnLambdaLow = new JButton(hexConverter(alphabet[10]));
 		btnLambdaLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnLambdaLow.setBounds(keyboardAnchorXRowTwo+btnAlphaLow.getWidth()*8, keyboardAnchorYRowTwo, keyWidth, keyHeight);
 		btnLambdaLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03bb");
+					appendString(hexConverter(alphabet[10]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnLambdaLow);
@@ -482,49 +506,49 @@ public class GreekGUI extends JFrame {
 			}
 		});
 		btnCap.setFont(new Font("Calibri", Font.PLAIN, 24));
-		btnCap.setBounds(55, 400, keyWidth+45, keyHeight);
+		btnCap.setBounds(keyboardAnchorXRowThree-45, keyboardAnchorYRowThree, keyWidth+45, keyHeight);
 		contentPane.add(btnCap);
 		
-		 btnZetaLow = new JButton("\u03b6");
+		 btnZetaLow = new JButton(hexConverter(alphabet[5]));
 		btnZetaLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnZetaLow.setBounds(keyboardAnchorXRowThree+btnAlphaLow.getWidth()*1, keyboardAnchorYRowThree, keyWidth, keyHeight);
 		btnZetaLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03b6");
+					appendString(hexConverter(alphabet[5]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnZetaLow);
 		
-		 btnChiLow = new JButton("\u03c7");
+		 btnChiLow = new JButton(hexConverter(alphabet[21]));
 		btnChiLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnChiLow.setBounds(keyboardAnchorXRowThree+btnAlphaLow.getWidth()*2, keyboardAnchorYRowThree, keyWidth, keyHeight);
 		btnChiLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03c7");
+					appendString(hexConverter(alphabet[21]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnChiLow);
 		
-		 btnPsiLow = new JButton("\u03c8");
+		 btnPsiLow = new JButton(hexConverter(alphabet[2]));
 		btnPsiLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnPsiLow.setBounds(keyboardAnchorXRowThree+btnAlphaLow.getWidth()*3, keyboardAnchorYRowThree, keyWidth, keyHeight);
 		btnPsiLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03c8");
+					appendString(hexConverter(alphabet[2]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnPsiLow);
 		
-		 btnOmegaLow = new JButton("\u03c9");
+		 btnOmegaLow = new JButton(hexConverter(alphabet[23]));
 		btnOmegaLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnOmegaLow.setBounds(keyboardAnchorXRowThree+btnAlphaLow.getWidth()*4, keyboardAnchorYRowThree, keyWidth, keyHeight);
 		btnOmegaLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03c9");
+					appendString(hexConverter(alphabet[23]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnOmegaLow);
@@ -540,24 +564,24 @@ public class GreekGUI extends JFrame {
 			}
 		});contentPane.add(btnBetaLow);
 		
-		 btnNuLow = new JButton("\u03bd");
+		 btnNuLow = new JButton(hexConverter(alphabet[12]));
 		btnNuLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnNuLow.setBounds(keyboardAnchorXRowThree+btnAlphaLow.getWidth()*6, keyboardAnchorYRowThree, keyWidth, keyHeight);
 		btnNuLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03bd");
+					appendString(hexConverter(alphabet[12]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnNuLow);
 		
-		 btnMuLow = new JButton("\u03bc");
+		 btnMuLow = new JButton(hexConverter(alphabet[11]));
 		btnMuLow.setFont(new Font("Calibri", Font.PLAIN, 22));
 		btnMuLow.setBounds(keyboardAnchorXRowThree+btnAlphaLow.getWidth()*7, keyboardAnchorYRowThree, keyWidth, keyHeight);
 		btnMuLow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					appendString("\u03bc");
+					appendString(hexConverter(alphabet[11]));
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnMuLow);
@@ -586,7 +610,7 @@ public class GreekGUI extends JFrame {
 		
 		JButton btnReturn = new JButton("RETURN");
 		btnReturn.setFont(new Font("Calibri", Font.PLAIN, 24));
-		btnReturn.setBounds(538, 350, keyWidth+63, keyHeight);
+		btnReturn.setBounds(keyboardAnchorXRowTwo+btnAlphaLow.getWidth()*9, keyboardAnchorYRowTwo, keyWidth+63, keyHeight);
 		btnReturn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
@@ -594,42 +618,42 @@ public class GreekGUI extends JFrame {
 					}catch(Exception e){}
 			}
 		});contentPane.add(btnReturn);
-JComboBox comboBox = new JComboBox();
-comboBox.setModel(new DefaultComboBoxModel(new String[] {"DIA", "\u1FBD", "\u1FCD", "\u1FCE", "\u1FCF", "\u1FFE", "\u1FDD", "\u1FDE", "\u1FDF", "\u1FFD", "\u1FEF", "\u1FC0"}));
-comboBox.setFont(new Font("Tahoma", Font.PLAIN, 26));
-comboBox.setBounds(450, 461, 100, 28);
-contentPane.add(comboBox);
-JButton btnNewButton = new JButton("SPACE");
-btnNewButton.setFont(new Font("Calibri", Font.PLAIN, 24));
-btnNewButton.addActionListener(new ActionListener() {
+		
+		
+final JComboBox cmbDiacritics = new JComboBox();
+cmbDiacritics.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent arg0) {
+		addDiacritic(cmbDiacritics.getSelectedIndex());
+	}
+});
+cmbDiacritics.setModel(new DefaultComboBoxModel(new String[] {"","\u1FBD", "\u1FFE", "\u1FCD", "\u1FDD", "\u1FCE", "\u1FDE","\u1FCF", "\u1FDF", "\u1FFD", "\u1FEF", "\u1FC0"}));
+cmbDiacritics.setFont(new Font("Tahoma", Font.PLAIN, 40));
+cmbDiacritics.setBounds(keyboardAnchorX+338, keyboardAnchorYRowThree+keyHeight, 70, 50);
+contentPane.add(cmbDiacritics);
+
+
+JButton btnSpace = new JButton("SPACE");
+btnSpace.setFont(new Font("Calibri", Font.PLAIN, 24));
+btnSpace.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent arg0) {
 		try{
 			appendString(" ");
 			}catch(Exception e){}
 	}
 });
-btnNewButton.setBounds(188, 450, 250, 50);
-contentPane.add(btnNewButton);
+btnSpace.setBounds(keyboardAnchorX+88, keyboardAnchorYRowThree+keyHeight, 250, 50);
+contentPane.add(btnSpace);
 JRadioButton rdbtnWithIotaSub = new JRadioButton("With iota sub");
 rdbtnWithIotaSub.setFont(new Font("Calibri", Font.PLAIN, 18));
-rdbtnWithIotaSub.setBounds(560, 457, 150, 23);
+rdbtnWithIotaSub.setBounds(keyboardAnchorX+460, keyboardAnchorYRowThree+keyHeight+15, 150, 23);
 contentPane.add(rdbtnWithIotaSub);
 	}
 	
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				}
-			}
-			public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				}
 			}
 			private void showMenu(MouseEvent e) {
-				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
 	}
